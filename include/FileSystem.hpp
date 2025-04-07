@@ -17,8 +17,7 @@ public:
 
     virtual ~fileSystemComponent() {}
 
-    bool operator<(const fileSystemComponent& other) const 
-    {
+    bool operator<(const fileSystemComponent& other) const {
         return std::tie(componentName, componentPath) < std::tie(other.componentName, other.componentPath);
     }
 
@@ -38,8 +37,7 @@ public:
     const std::string& getName() const { return componentName; }
     const std::string& getPath() const { return componentPath; }
 
-    std::string getFullPath() const 
-    {
+    std::string getFullPath() const {
         return componentPath == "/" ? "/" + componentName : componentPath + "/" + componentName;
     }
 };
@@ -52,8 +50,7 @@ bool isValidParentPath(const std::string& fullPath)
     std::string parentPath = "/";
     std::string currentName = fullPath;
 
-    if (lastSlash != std::string::npos) 
-    {
+    if (lastSlash != std::string::npos) {
         parentPath = (lastSlash == 0) ? "/" : fullPath.substr(0, lastSlash);
         currentName = fullPath.substr(lastSlash + 1);
     }
@@ -63,8 +60,7 @@ bool isValidParentPath(const std::string& fullPath)
     {
         for (auto* comp : it->second) 
         {
-            if (comp->getName() == currentName && comp->getType() == "File") 
-            {
+            if (comp->getName() == currentName && comp->getType() == "File") {
                 std::cerr << "Error: '" << fullPath << "' is a file, can't add anything to it.\n";
                 return false;
             }
@@ -72,8 +68,7 @@ bool isValidParentPath(const std::string& fullPath)
 
         for (auto* comp : it->second) 
         {
-            if (comp->getName() == parentPath && comp->getType() == "File") 
-            {
+            if (comp->getName() == parentPath && comp->getType() == "File") {
                 std::cerr << "Error: can't add to '" << parentPath << "' — it's a file!\n";
                 return false;
             }
@@ -89,14 +84,12 @@ public:
         : fileSystemComponent(name, path)
     {
         if (!isValidParentPath(getFullPath())) return;
-        if (isCreated()) 
-        {
+        if (isCreated()) {
             fileSystemRegistry[path].insert(this);
         }
     }
 
-    ~file() override 
-    {
+    ~file() override {
         std::cout << getType() << " '" << componentName << "' has been deleted from '" << componentPath << "'\n";
     }
 
@@ -109,14 +102,12 @@ public:
         : fileSystemComponent(name, path)
     {
         if (!isValidParentPath(getFullPath())) return;
-        if (isCreated()) 
-        {
+        if (isCreated()) {
             fileSystemRegistry[path].insert(this);
         }
     }
 
-    ~directory() override 
-    {
+    ~directory() override {
         std::cout << getType() << " '" << componentName << "' has been deleted from '" << componentPath << "'\n";
     }
 
