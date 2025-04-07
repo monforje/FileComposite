@@ -1,32 +1,47 @@
 #include <FileSystem.h>
 #include <iostream>
 
+fileSystem Sys;
+
 fileSystemComponent::fileSystemComponent(const std::string& componentName, const std::string& componentPath)
 {
 	this->componentName = componentName;
 	this->componentPath = componentPath;
+
+	auto result = Sys.rootDir.insert(*this);
+	if (!result.second) {
+		std::cerr << getType() << " already exists in the system!" << std::endl;
+	}
 }
 
-void fileSystem::addComponent(fileSystemComponent* component)
+bool fileSystemComponent::operator<(const fileSystemComponent& other) const
 {
-	fileComponents.push_back(component);
-	std::cerr << "The " << component->getName() << " is added to " << component->getPath() << std::endl;
+	return std::tie(componentName, componentPath) < std::tie(other.componentName, other.componentPath);
+}
+
+bool fileSystemComponent::isCreated() const 
+{
+	if (componentName.empty() || componentPath.empty()) 
+	{
+		std::cerr << "Can't create " << getType() << ": name or path is empty!" << std::endl;
+		return false;
+	}
+	if (Sys.rootDir.find(*this) == Sys.rootDir.end()) 
+	{
+		std::cerr << getType() << " not found in the system!" << std::endl;
+		return false;
+	}
+	std::cout << getType() << " '" << componentName << "' at path '" << componentPath
+		<< "' is successfully created in the system." << std::endl;
+	return true;
 }
 
 fileSystemComponent::~fileSystemComponent() {}
 
-file::file(const std::string& fileName, const std::string& filePath) 
+file::file(const std::string& fileName, const std::string& filePath)
 	: fileSystemComponent(fileName, filePath)
 {
-	if (!this->componentName.empty() && !this->componentPath.empty())
-	{
-		std::cerr << "File name is: " << componentName << std::endl;
-		std::cerr << "File path is: " << componentPath << std::endl;
-	}
-	else
-	{
-		std::cerr << "Can't create file!" << std::endl;
-	}
+	isCreated();
 }
 
 file::~file()
@@ -34,21 +49,14 @@ file::~file()
 	std::cerr << "File " << this->componentName << " is deleted" << std::endl;
 }
 
-directory::directory(const std::string& directoryName, const std::string& directoryPath) 
+directory::directory(const std::string& directoryName, const std::string& directoryPath)
 	: fileSystemComponent(directoryName, directoryPath)
 {
-	if (!this->componentName.empty() && !this->componentPath.empty())
-	{
-		std::cerr << "Directory name is: " << componentName << std::endl;
-		std::cerr << "Directory path is: " << componentPath << std::endl;
-	}
-	else
-	{
-		std::cerr << "Can't create directory!" << std::endl;
-	}
+	isCreated();
 }
+
 
 directory::~directory()
 {
-	std::cerr << "Directory " << this->componentName << " is deleted" << std::endl;
+	std::cerr << "Directory " << componentName << " is deleted" << std::endl;
 }
