@@ -1,25 +1,36 @@
-#include <FileSystem.hpp>
+#include "filesystem.hpp"
 #include <iostream>
 
-int main()
-{
-    directory* root = new directory("root", "/");
-    file* f1 = new file("file1.txt", "/root");
-    directory* d1 = new directory("/subdir", "/root");
-    file* f2 = new file("file2.txt", "/root");
-    directory* d2 = new directory("/docs", "/root/subdir");
-    directory* d3 = new directory("/downloads", "/root/subdir/docs");
-    file* f3 = new file("file2.txt", "/root/subdir/docs");
+int main() {
+    // Инициализируем файловую систему с корневой директорией "root" и путем "/"
+    FileSystem fs("root", "/");
 
-    std::cout << "\nContents of '/':\n";
-    for (auto* comp : fileSystemRegistry["/"]) {
-        std::cout << " - " << comp->getType() << ": " << comp->getName() << std::endl;
-    }
+    // Демонстрация создания директорий и файлов
+    fs.mkdir("Documents");    // создается "/Documents"
+    fs.mkdir("Downloads");    // создается "/Downloads"
+    fs.touch("readme.txt");   // создается "/readme.txt"
+    fs.ls();
+    fs.tree();
 
-    std::cout << "\nContents of '/root/subdir/docs':\n";
-    for (auto* comp : fileSystemRegistry["/root/subdir/docs"]) {
-        std::cout << " - " << comp->getType() << ": " << comp->getName() << std::endl;
-    }
+    // Переходим в директорию Documents
+    fs.cd("Documents");       // теперь текущая директория: "/Documents"
+    fs.pwd();
+    fs.touch("report.docx");  // создается "/Documents/report.docx"
+    fs.mkdir("Photos");       // создается "/Documents/Photos"
+    fs.ls();
+    fs.tree();
+
+    // Возвращаемся на уровень выше (в корень)
+    fs.cd("..");
+    fs.pwd();
+
+    // Удаляем директорию Downloads
+    fs.rm("Downloads");
+    fs.ls();
+    fs.tree();
+
+    // Попытка перейти в несуществующую директорию
+    fs.cd("NotExist");
 
     return 0;
 }
